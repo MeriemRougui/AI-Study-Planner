@@ -1,0 +1,49 @@
+# ----------------------------
+# Python cache files
+# ----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ----------------------------
+# Virtual environments
+# ----------------------------
+venv/
+env/
+
+# ----------------------------
+# Environment / Secrets
+# ----------------------------
+.env
+*.env
+
+# ----------------------------
+# Model / Machine Learning
+# (optional to ignore .pkl if too large)
+# ----------------------------
+models/*.pkl
+
+# ----------------------------
+# Database / SQL Files
+# (optional: ignore raw SQL if you want, otherwise keep)
+# ----------------------------
+# database_sql/*.sql
+
+# ----------------------------
+# Logs and temporary files
+# ----------------------------
+*.log
+*.tmp
+*.bak
+
+# ----------------------------
+# IDE / Editor files
+# ----------------------------
+.vscode/
+.idea/
+
+# ----------------------------
+# System files
+# ----------------------------
+.DS_Store
+Thumbs.db
