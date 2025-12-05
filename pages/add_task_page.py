@@ -1,7 +1,9 @@
 import streamlit as st
 from utils.db import add_task
+from components.navbar import navigation_bar
 
 def show_add_task():
+    navigation_bar()
     st.title("➕ Add New Task")
 
     user = st.session_state.get("user")

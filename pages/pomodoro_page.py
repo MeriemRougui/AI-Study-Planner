@@ -1,10 +1,8 @@
 import time
 import streamlit as st
 from utils.db import get_tasks_for_user, get_db_connection
+from components.navbar import navigation_bar
 
-# ==================================================
-# DATABASE STATS - Total Focus Time & Sessions
-# ==================================================
 def get_total_focus(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -23,11 +21,8 @@ def get_total_focus(user_id):
     total_minutes = result[1] if result[1] else 0
     return total_sessions, total_minutes
 
-
-# ==================================================
-# MAIN POMODORO SCREEN
-# ==================================================
 def show_pomodoro():
+    navigation_bar()
     user = st.session_state.get("user")
     if not user:
         st.session_state["page"] = "login"
@@ -77,7 +72,6 @@ def show_pomodoro():
     else:
         st.markdown(f"### ⏳ Focus Session: **{minutes:02d}:{seconds:02d}**")
 
-    # ----- Buttons -----
     col1, col2, col3 = st.columns(3)
     if col1.button("▶ Start"):
         st.session_state.pomodoro_running = True
@@ -90,12 +84,10 @@ def show_pomodoro():
         st.session_state.on_break = False
         st.session_state.pomodoro_time = st.session_state.pomodoro_duration * 60
 
-    # ======== COUNTDOWN SYSTEM ========
     if st.session_state.pomodoro_running:
         time.sleep(1)
         st.session_state.pomodoro_time -= 1
 
-        # 🔥 Focus Completed → Start Break
         if st.session_state.pomodoro_time <= 0 and not st.session_state.on_break:
             st.success("🎉 Focus Finished — Break Time Starts! 5 minutes 🧊")
             log_task_focus_time(selected_task_id, st.session_state.pomodoro_duration)
@@ -105,7 +97,6 @@ def show_pomodoro():
             st.session_state.pomodoro_running = True
             st.rerun()
 
-        # 🧊 Break Ended → Reset for new session
         elif st.session_state.pomodoro_time <= 0 and st.session_state.on_break:
             st.info("⏳ Break Over — Ready for another Pomodoro?")
             st.session_state.on_break = False
@@ -115,9 +106,6 @@ def show_pomodoro():
 
         st.rerun()
 
-    # ==================================================
-    # LIVE ANALYTICS
-    # ==================================================
     st.write("---")
     st.subheader("📊 Productivity Stats")
 
@@ -127,10 +115,6 @@ def show_pomodoro():
     st.metric("Total Focus Minutes", f"{total_minutes} min")
     st.progress(min(float(total_minutes) / 300, 1.0))  # 300 min = 5-hour goal!
 
-
-# ==================================================
-# DB INSERT = Save Focus Session Time
-# ==================================================
 def log_task_focus_time(task_id, minutes):
     conn = get_db_connection()
     cursor = conn.cursor()

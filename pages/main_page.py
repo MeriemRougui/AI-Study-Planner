@@ -7,9 +7,62 @@ from utils.db import (
     update_task_completion
 )
 
-# -------------------------------------------------------
-# AI RECOMMENDATION FUNCTION
-# -------------------------------------------------------
+def navigation_bar():
+    st.markdown(
+        """
+        <style>
+        .topnav {
+            background-color: #111827;
+            overflow: hidden;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .topnav a {
+            float: left;
+            color: white;
+            text-align: center;
+            padding: 10px 18px;
+            text-decoration: none;
+            font-size: 17px;
+            font-weight: 600;
+        }
+        .topnav a:hover {
+            background-color: #4F46E5;
+            border-radius:6px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    col1, col2, col3, col4, col5 = st.columns(5)
+
+    with col1:
+        if st.button("🏠 Home", key="nav_home"):
+            st.session_state["page"] = "main"
+            st.rerun()
+
+    with col2:
+        if st.button("➕ Add Task", key="nav_add"):
+            st.session_state["page"] = "add_task"
+            st.rerun()
+
+    with col3:
+        if st.button("🍅 Pomodoro", key="nav_pomo"):
+            st.session_state["page"] = "pomodoro"
+            st.rerun()
+
+    with col4:
+        if st.button("📊 Analytics", key="nav_analytics"):
+            st.session_state["page"] = "analytics"
+            st.rerun()
+
+    with col5:
+        if st.button("🤖 Study AI", key="nav_ai"):
+            st.session_state["page"] = "ai_assistant"
+            st.rerun()
+
+
 def show_ai_recommendation(user_id):
     model = joblib.load("models/priority_model.pkl")
 
@@ -44,131 +97,76 @@ def show_ai_recommendation(user_id):
         **⏱ Duration:** {best_task['duration']} hours  
     """)
 
-
-# -------------------------------------------------------
-# MAIN PAGE
-# -------------------------------------------------------
 def show_main():
+    navigation_bar()
+
     user = st.session_state.get("user")
     if not user:
         st.session_state["page"] = "login"
         st.rerun()
 
     st.title("📚 AI Study Planner")
-    st.subheader(f"Welcome back, **{user['nickname']}** 👋")
-
+    st.write(f"Welcome back, **{user['nickname']}** 👋")
     st.write("---")
 
-    # -------------------------------------------------------
-    # AI RECOMMENDATION SECTION
-    # -------------------------------------------------------
+    # ================= AI Recommendation ==================
     st.subheader("🤖 AI Assistant")
 
     if "ask_ai" not in st.session_state:
-        st.session_state["ask_ai"] = False
+        st.session_state.ask_ai = False
 
     if st.button("🔥 What Should I Do Next?"):
-        st.session_state["ask_ai"] = True
+        st.session_state.ask_ai = True
         st.rerun()
 
-    if st.session_state["ask_ai"]:
+    if st.session_state.ask_ai:
         show_ai_recommendation(user["id"])
 
     st.write("---")
 
-    # -------------------------------------------------------
-    # FILTER BUTTONS (Done / Undone)
-    # -------------------------------------------------------
+    # ================= Filter Tasks =======================
     if "task_filter" not in st.session_state:
-        st.session_state["task_filter"] = 0  # default = show undone
+        st.session_state.task_filter = 0
 
     st.subheader("Filter Tasks")
-
     colA, colB = st.columns(2)
 
-    with colA:
-        if st.button("📌 UNDONE Tasks"):
-            st.session_state["task_filter"] = 0
-            st.session_state["ask_ai"] = False
-            st.rerun()
+    if colA.button("📌 Show UNDONE"):
+        st.session_state.task_filter = 0
+        st.rerun()
 
-    with colB:
-        if st.button("✔ DONE Tasks"):
-            st.session_state["task_filter"] = 1
-            st.session_state["ask_ai"] = False
-            st.rerun()
+    if colB.button("✔ Show DONE"):
+        st.session_state.task_filter = 1
+        st.rerun()
 
     st.write("---")
 
-    # Load tasks based on filter
-    tasks = get_tasks_for_user(user["id"], st.session_state["task_filter"])
-
+    # ================= Tasks List =========================
     st.header("📝 Your Tasks")
+    tasks = get_tasks_for_user(user["id"], st.session_state.task_filter)
 
     if not tasks:
-        st.info("No tasks found for this category.")
-    else:
-        for task in tasks:
-            col1, col2, col3 = st.columns([4, 1, 1])
+        st.info("No tasks here yet.")
+        return
 
-            # ------------------------------------------
-            # ✔ COMPLETION CHECKBOX
-            # ------------------------------------------
-            with col1:
-                is_done = st.checkbox(
-                    f"{task['task_name']} – {task['due_date']}",
-                    value=bool(task["completed"]),
-                    key=f"done_{task['id']}"
-                )
+    for task in tasks:
+        col1, col2, col3 = st.columns([4, 1, 1])
 
-                if is_done != bool(task["completed"]):
-                    update_task_completion(task["id"], int(is_done))
-                    st.session_state["ask_ai"] = False
-                    st.rerun()
+        with col1:
+            is_done = st.checkbox(
+                f"{task['task_name']} – {task['due_date']}",
+                value=bool(task["completed"]),
+                key=f"done_{task['id']}"
+            )
+            if is_done != bool(task["completed"]):
+                update_task_completion(task["id"], int(is_done))
+                st.rerun()
 
-            # ------------------------------------------
-            # ✏ EDIT BUTTON
-            # ------------------------------------------
-            with col2:
-                if st.button("✏️", key=f"edit_{task['id']}"):
-                    st.session_state["task_to_edit"] = task
-                    st.session_state["ask_ai"] = False
-                    st.session_state["page"] = "edit_task"
-                    st.rerun()
-
-            # ------------------------------------------
-            # ❌ DELETE BUTTON
-            # ------------------------------------------
-            with col3:
-                if st.button("❌", key=f"delete_{task['id']}"):
-                    delete_task(task["id"])
-                    st.session_state["ask_ai"] = False
-                    st.rerun()
-
-    st.write("---")
-
-    # -------------------------------------------------------
-    # Bottom Buttons (Add Task / Pomodoro / Analytics / Logout)
-    # -------------------------------------------------------
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        if st.button("➕ Add New Task"):
-            st.session_state["page"] = "add_task"
+        if col2.button("✏️", key=f"edit_{task['id']}"):
+            st.session_state["task_to_edit"] = task
+            st.session_state["page"] = "edit_task"
             st.rerun()
 
-    with col2:
-        if st.button("🍅 Pomodoro"):
-            st.session_state["page"] = "pomodoro"
-            st.rerun()
-
-    with col3:
-        if st.button("📊 Analytics"):
-            st.session_state["page"] = "analytics"
-            st.rerun()
-
-    with col4:
-        if st.button("🚪 Logout"):
-            st.session_state["user"] = None
-            st.session_state["page"] = "login"
+        if col3.button("❌", key=f"delete_{task['id']}"):
+            delete_task(task["id"])
             st.rerun()

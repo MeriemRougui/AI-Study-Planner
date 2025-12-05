@@ -1,10 +1,8 @@
 # app.py
 import streamlit as st
 from pages import login_page, signup_page, main_page, add_task_page
-from pages import edit_task_page
-from pages import analytics_page
-from pages import pomodoro_page
-
+from pages import edit_task_page, analytics_page, pomodoro_page
+from pages.ai_assistant import show_ai_assistant
 
 # -----------------------------
 # Initialize session state
@@ -35,7 +33,7 @@ elif page == "main":
 
 elif page == "add_task":
     if st.session_state["user"]:
-        add_task_page.show_add_task()  # Ensure this matches the function name in add_task_page.py
+        add_task_page.show_add_task()
     else:
         st.session_state["page"] = "login"
         st.rerun()
@@ -47,8 +45,29 @@ elif page == "edit_task":
         st.session_state["page"] = "login"
         st.rerun()
 
-elif st.session_state["page"] == "analytics":
-    analytics_page.show_analytics()
+elif page == "analytics":  # Fixed: use page variable consistently
+    if st.session_state["user"]:
+        analytics_page.show_analytics()
+    else:
+        st.session_state["page"] = "login"
+        st.rerun()
 
-elif st.session_state["page"] == "pomodoro":
-    pomodoro_page.show_pomodoro()
+elif page == "pomodoro":  # Fixed: use page variable consistently
+    if st.session_state["user"]:
+        pomodoro_page.show_pomodoro()
+    else:
+        st.session_state["page"] = "login"
+        st.rerun()
+
+elif page == "ai_assistant":
+    if st.session_state["user"]:  # Added authentication check
+        show_ai_assistant()
+    else:
+        st.session_state["page"] = "login"
+        st.rerun()
+
+# Add a catch-all for unknown pages
+else:
+    st.error(f"Unknown page: {page}")
+    st.session_state["page"] = "login"
+    st.rerun()

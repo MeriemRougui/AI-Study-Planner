@@ -1,49 +1,238 @@
+# ============================================
+# AI Study Planner - .gitignore
+# ============================================
+
 # ----------------------------
-# Python cache files
+# Python Specific
 # ----------------------------
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
+*.pyd
+.Python
 
-# ----------------------------
-# Virtual environments
-# ----------------------------
+# Virtual Environments
 venv/
 env/
+ENV/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
 
 # ----------------------------
-# Environment / Secrets
+# Environment & Secrets
 # ----------------------------
+# NEVER COMMIT SECRETS!
 .env
-*.env
+.env.*
+!.env.example
+secrets.toml
+.streamlit/secrets.toml
+credentials.json
+*.key
+*.pem
+*.cert
 
 # ----------------------------
-# Model / Machine Learning
-# (optional to ignore .pkl if too large)
+# API Keys & Configuration
 # ----------------------------
+config_private.py
+keys.py
+api_keys.py
+
+# ----------------------------
+# Machine Learning Models
+# ----------------------------
+# Large model files
 models/*.pkl
+models/*.joblib
+models/*.h5
+models/*.pt
+models/*.pth
+models/checkpoints/
+
+# Training data
+*.csv
+*.json
+*.parquet
+datasets/
+
+# Model outputs
+outputs/
+predictions/
+results/
 
 # ----------------------------
-# Database / SQL Files
-# (optional: ignore raw SQL if you want, otherwise keep)
+# Database
 # ----------------------------
-# database_sql/*.sql
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+database/*.sqlite
+database/*.db
+
+# Database dumps
+*.dump
+*.backup
 
 # ----------------------------
-# Logs and temporary files
+# Streamlit Specific
+# ----------------------------
+.streamlit/  # Keep config.toml but NOT secrets.toml
+!/.streamlit/config.toml  # Keep this one
+
+# ----------------------------
+# OS Generated Files
+# ----------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ----------------------------
+# IDE Files
+# ----------------------------
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Eclipse
+.project
+.pydevproject
+.settings/
+
+# ----------------------------
+# Logs and Temporary Files
 # ----------------------------
 *.log
 *.tmp
 *.bak
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
 # ----------------------------
-# IDE / Editor files
+# Uploaded Files
 # ----------------------------
-.vscode/
-.idea/
+uploads/
+downloads/
+temp/
 
 # ----------------------------
-# System files
+# Documentation
 # ----------------------------
-.DS_Store
-Thumbs.db
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# ----------------------------
+# Testing
+# ----------------------------
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# ============================================
+# Files TO KEEP (Important!)
+# ============================================
+!/.streamlit/config.toml
+!/database_sql/*.sql
+!/requirements.txt
+!/README.md
+!/LICENSE
+!/.gitignore
